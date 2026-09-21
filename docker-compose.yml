@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: loyalty
       POSTGRES_DB: loyalty
     ports:
-      - '5432:5432'
+      - '15432:5432'
     volumes:
       - loyalty_postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,7 +18,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - '6379:6379'
+      - '16379:6379'
 
   backend:
     build: ./backend
@@ -28,7 +28,7 @@ services:
       JWT_SECRET: dev-secret-change-me
       PORT: 3001
     ports:
-      - '3001:3001'
+      - '13001:3001'
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,11 +37,12 @@ services:
     command: sh -c "npx prisma migrate deploy && node dist/main.js"
 
   frontend:
-    build: ./frontend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:13001
     ports:
-      - '3000:3000'
+      - '13000:3000'
     depends_on:
       - backend
 
